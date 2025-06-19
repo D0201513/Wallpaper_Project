@@ -1,23 +1,16 @@
 ---
-- name: Set wallpaper on all GNOME-based Linux clients
-  hosts: all
-  become: yes
-  vars:
-    wallpaper_file: "wallpaper.png"
-    dest_path: "/usr/share/backgrounds/{{ wallpaper_file }}"
-    wallpaper_uri: "file:///usr/share/backgrounds/{{ wallpaper_file }}"
-
+- name: 🖼 Set GNOME wallpaper on Kali
+  hosts: kali
+  become: true
   tasks:
-    - name: 📥 Copy wallpaper to client machine
+
+    - name: 📤 Copy wallpaper image
       copy:
-        src: "{{ wallpaper_file }}"
-        dest: "{{ dest_path }}"
+        src: kali-wallpaper.png
+        dest: /home/kali/kali-wallpaper.png
+        owner: kali
+        group: kali
         mode: '0644'
 
-    - name: 🖼 Apply wallpaper using gsettings
-      become_user: root
-      command: >
-        gsettings set org.gnome.desktop.background picture-uri "{{ wallpaper_uri }}"
-      environment:
-        DISPLAY: ":0"
-        XAUTHORITY: "/root/.Xauthority"
+    - name: 🖼 Set wallpaper using pre-created script
+      command: /usr/local/bin/set-wallpaper.sh /home/kali/kali-wallpaper.png
