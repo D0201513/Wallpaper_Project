@@ -6,7 +6,7 @@
 
     - name: 📤 Copy wallpaper image
       copy:
-        src: kali-wallpaper.png
+        src: wallpaper.png
         dest: /home/kali/wallpaper.png
         owner: kali
         group: kali
