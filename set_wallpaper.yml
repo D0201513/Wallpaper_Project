@@ -7,10 +7,10 @@
     - name: 📤 Copy wallpaper image
       copy:
         src: kali-wallpaper.png
-        dest: /home/kali/kali-wallpaper.png
+        dest: /home/kali/wallpaper.png
         owner: kali
         group: kali
         mode: '0644'
 
     - name: 🖼 Set wallpaper using pre-created script
-      command: /usr/local/bin/set-wallpaper.sh /home/kali/kali-wallpaper.png
+      command: /usr/local/bin/set-wallpaper.sh /home/kali/wallpaper.png
