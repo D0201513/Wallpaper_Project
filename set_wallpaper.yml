@@ -15,9 +15,9 @@
         mode: '0644'
 
     - name: 🖼 Apply wallpaper using gsettings
-      become_user: "{{ ansible_user }}"
+      become_user: root
       command: >
         gsettings set org.gnome.desktop.background picture-uri "{{ wallpaper_uri }}"
       environment:
         DISPLAY: ":0"
-        XAUTHORITY: "/home/{{ ansible_user }}/.Xauthority"
+        XAUTHORITY: "/root/.Xauthority"
