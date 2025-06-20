@@ -7,7 +7,7 @@
     - name: 📤 Copy wallpaper image to Windows
       win_copy:
         src: wallpaper.png
-        dest: C:\Users\Public\Pictures\wallpaper.jpg
+        dest: C:\Users\Public\Pictures\wallpaper.png
 
     - name: 🖼 Set wallpaper using PowerShell
       win_shell: |
