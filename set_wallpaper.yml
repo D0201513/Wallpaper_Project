@@ -1,16 +1,22 @@
 ---
-- name: 🖼 Set GNOME wallpaper on Kali
-  hosts: kali
-  become: true
+- name: 🪟 Set Windows Wallpaper Remotely
+  hosts: windows
+  gather_facts: false
+
   tasks:
-
-    - name: 📤 Copy wallpaper image
-      copy:
+    - name: 📤 Copy wallpaper image to Windows
+      win_copy:
         src: wallpaper.png
-        dest: /home/kali/wallpaper.png
-        owner: kali
-        group: kali
-        mode: '0644'
+        dest: C:\Users\Public\Pictures\wallpaper.jpg
 
-    - name: 🖼 Set wallpaper using pre-created script
-      command: /usr/local/bin/set-wallpaper.sh /home/kali/wallpaper.png
+    - name: 🖼 Set wallpaper using PowerShell
+      win_shell: |
+        $code = @"
+        using System.Runtime.InteropServices;
+        public class Wallpaper {
+            [DllImport("user32.dll", SetLastError = true)]
+            public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+        }
+        "@
+        Add-Type $code
+        [Wallpaper]::SystemParametersInfo(20, 0, "C:\Users\Public\Pictures\wallpaper.png", 3)
