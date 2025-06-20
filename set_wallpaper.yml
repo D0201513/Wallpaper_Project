@@ -9,18 +9,25 @@
         src: wallpaper.png
         dest: C:\Users\Public\Pictures\wallpaper.png
 
-    - name: 🖼️ Set wallpaper path in registry
+    - name: 🖼️ Set wallpaper path
       win_regedit:
         path: HKCU:\Control Panel\Desktop
         name: Wallpaper
         data: C:\Users\Public\Pictures\wallpaper.png
         type: string
 
-    - name: 🧭 Set wallpaper style (Fill)
+    - name: 🧭 Set WallpaperStyle to Fill
       win_regedit:
         path: HKCU:\Control Panel\Desktop
         name: WallpaperStyle
         data: "10"
+        type: string
+
+    - name: 📐 Set TileWallpaper (required for Fill)
+      win_regedit:
+        path: HKCU:\Control Panel\Desktop
+        name: TileWallpaper
+        data: "0"
         type: string
 
     - name: 🔄 Apply wallpaper using RUNDLL32
