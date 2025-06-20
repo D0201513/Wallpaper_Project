@@ -9,13 +9,19 @@
         src: wallpaper.png
         dest: C:\Users\Public\Pictures\wallpaper.png
 
-    - name: 🖼️ Set wallpaper via registry
+    - name: 🖼️ Set wallpaper path in registry
       win_regedit:
         path: HKCU:\Control Panel\Desktop
         name: Wallpaper
         data: C:\Users\Public\Pictures\wallpaper.png
         type: string
 
+    - name: 🧭 Set wallpaper style (Fill)
+      win_regedit:
+        path: HKCU:\Control Panel\Desktop
+        name: WallpaperStyle
+        data: "10"
+        type: string
+
     - name: 🔄 Apply wallpaper using RUNDLL32
-      win_shell: |
-        RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters 1, True
+      win_command: RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters 1, True
