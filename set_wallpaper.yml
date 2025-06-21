@@ -15,7 +15,7 @@
 
     - name: 🖼️ Run wallpaper script as logged-in user via scheduled task
       win_shell: |
-        $user = "$env:COMPUTERNAME\$env:USERNAME"
+        $user = "$env:COMPUTERNAME + '\' + $env:USERNAME"
         Write-Host "Running scheduled task as user: $user"
 
         $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument '-ExecutionPolicy Bypass -File "C:\Users\Public\set_wallpaper.ps1"'
