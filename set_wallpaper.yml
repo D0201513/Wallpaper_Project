@@ -30,17 +30,21 @@
         data: "0"
         type: string
 
-    - name: 🖼️ Force wallpaper using SystemParametersInfo API
+    - name: 🖼️ Force wallpaper as current user via scheduled task
       win_shell: |
         $imgPath = "C:\Users\Public\Pictures\wallpaper.png"
-        Add-Type -TypeDefinition @"
-        using System;
-        using System.Runtime.InteropServices;
-        public class Wallpaper {
-          [DllImport("user32.dll", SetLastError = true)]
-          public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
-        }
-        "@
-        [Wallpaper]::SystemParametersInfo(20, 0, $imgPath, 3)
+        $taskName = "SetWallpaperTask"
+        $encodedCommand = @"
+Add-Type -TypeDefinition '[DllImport("user32.dll", SetLastError = true)] public static class NativeMethods { public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni); }'
+[NativeMethods]::SystemParametersInfo(20, 0, "$imgPath", 3)
+"@
+
+        $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -Command `$encodedCommand`"
+        $principal = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive -RunLevel Highest
+        $task = New-ScheduledTask -Action $action -Principal $principal
+        Register-ScheduledTask -TaskName $taskName -InputObject $task -Force
+        Start-ScheduledTask -TaskName $taskName
+        Start-Sleep -Seconds 5
+        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
       args:
         executable: powershell
