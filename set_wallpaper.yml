@@ -1,34 +1,45 @@
 ---
-- name: 🪟 Set Windows Wallpaper via Registry
+- name: 🪟 Set Windows Wallpaper via Scheduled Task
   hosts: windows
   gather_facts: false
+  vars:
+    wallpaper_path: "C:\\Users\\Public\\Pictures\\wallpaper.png"
 
   tasks:
     - name: 📄 Copy wallpaper image to Windows
       win_copy:
         src: wallpaper.png
-        dest: C:\Users\Public\Pictures\wallpaper.png
+        dest: "{{ wallpaper_path }}"
 
-    - name: 🖼️ Set wallpaper path
-      win_regedit:
-        path: HKCU:\Control Panel\Desktop
-        name: Wallpaper
-        data: C:\Users\Public\Pictures\wallpaper.png
-        type: string
+    - name: 📝 Create wallpaper set script
+      win_copy:
+        dest: "C:\\Users\\Public\\set-wallpaper.ps1"
+        content: |
+          Add-Type @"
+          using System.Runtime.InteropServices;
+          public class Wallpaper {
+              [DllImport("user32.dll", SetLastError = true)]
+              public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+          }
+"@
+          [Wallpaper]::SystemParametersInfo(20, 0, "{{ wallpaper_path }}", 3)
 
-    - name: 🧭 Set WallpaperStyle to Fill
-      win_regedit:
-        path: HKCU:\Control Panel\Desktop
-        name: WallpaperStyle
-        data: "10"
-        type: string
+    - name: 🗓️ Create a scheduled task to apply the wallpaper
+      win_scheduled_task:
+        name: "SetWallpaperTask"
+        description: "Set desktop wallpaper"
+        actions:
+          - path: powershell.exe
+            arguments: "-ExecutionPolicy Bypass -File C:\\Users\\Public\\set-wallpaper.ps1"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        run_level: highest
+        state: present
+        enabled: yes
+        trigger:
+          - type: once
+            start_boundary: "{{ (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ') | community.general.to_windows_datetime).split('.')[0] }}"
+        execution_time_limit: PT5M
 
-    - name: 📐 Set TileWallpaper (required for Fill)
-      win_regedit:
-        path: HKCU:\Control Panel\Desktop
-        name: TileWallpaper
-        data: "0"
-        type: string
-
-    - name: 🔄 Apply wallpaper using RUNDLL32
-      win_command: RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters 1, True
+    - name: ▶️ Run the scheduled task immediately
+      win_command: schtasks /run /tn SetWallpaperTask
