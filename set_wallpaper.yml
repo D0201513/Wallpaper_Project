@@ -7,7 +7,6 @@
     script_path: 'C:\\Users\\Public\\set-wallpaper.ps1'
 
   tasks:
-
     - name: 📄 Copy wallpaper image to Windows
       win_copy:
         src: wallpaper.png
@@ -32,7 +31,8 @@
         description: Set desktop wallpaper
         actions:
           - path: powershell.exe
-            arguments: "-ExecutionPolicy Bypass -File \"{{ script_path }}\""
+            arguments: >
+              -ExecutionPolicy Bypass -File "{{ script_path }}"
         username: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
         run_level: highest
@@ -40,7 +40,7 @@
         enabled: yes
         trigger:
           - type: once
-            start_boundary: "{{ (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ') | community.general.to_windows_datetime).split('.')[0] }}"
+            start_boundary: "2025-06-21T10:00:00"  # <-- Hardcoded start time avoids Jinja parsing errors
         execution_time_limit: PT5M
 
     - name: ▶️ Run the scheduled task immediately
