@@ -9,32 +9,11 @@
         src: wallpaper.png
         dest: C:\Users\Public\Pictures\wallpaper.png
 
-    - name: 🖼️ Set wallpaper path in registry (optional)
-      win_regedit:
-        path: HKCU:\Control Panel\Desktop
-        name: Wallpaper
-        data: C:\Users\Public\Pictures\wallpaper.png
-        type: string
-
-    - name: 🧭 Set WallpaperStyle to Fill
-      win_regedit:
-        path: HKCU:\Control Panel\Desktop
-        name: WallpaperStyle
-        data: "10"
-        type: string
-
-    - name: 📐 Set TileWallpaper (required for Fill)
-      win_regedit:
-        path: HKCU:\Control Panel\Desktop
-        name: TileWallpaper
-        data: "0"
-        type: string
-
-    - name: 🖼️ Force wallpaper as current user via scheduled task
+    - name: 🖼️ Set wallpaper as current user via scheduled task
       win_shell: |
         $imgPath = "C:\Users\Public\Pictures\wallpaper.png"
         $taskName = "SetWallpaperTask"
-        $command = @'
+        $command = @"
 Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
@@ -43,8 +22,8 @@ public static class NativeMethods {
   public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
 }
 "@
-[NativeMethods]::SystemParametersInfo(20, 0, "$imgPath", 3)
-'@
+[NativeMethods]::SystemParametersInfo(20, 0, '$imgPath', 3)
+"@
 
         $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -Command `$command`"
         $principal = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive -RunLevel Highest
