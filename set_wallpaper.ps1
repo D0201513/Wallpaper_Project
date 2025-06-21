@@ -1,3 +1,7 @@
+param (
+  [string]$ImagePath = "C:\Users\Public\Pictures\wallpaper.png"
+)
+
 $code = @"
 using System;
 using System.Runtime.InteropServices;
