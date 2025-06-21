@@ -1,5 +1,5 @@
 ---
-- name: 🪟 Set Windows Wallpaper via PowerShell API
+- name: 🪟 Set Windows Wallpaper via Scheduled Task Script
   hosts: windows
   gather_facts: false
 
@@ -9,27 +9,10 @@
         src: wallpaper.png
         dest: C:\Users\Public\Pictures\wallpaper.png
 
-    - name: 🖼️ Force wallpaper as current user via scheduled task
-      win_shell: >
-        $imgPath = "C:\Users\Public\Pictures\wallpaper.png";
-        $code = @'
-        using System;
-        using System.Runtime.InteropServices;
-        public static class NativeMethods {
-          [DllImport("user32.dll", SetLastError = true)]
-          public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
-        }
-        '@;
-        Add-Type -TypeDefinition $code;
-        [NativeMethods]::SystemParametersInfo(20, 0, $imgPath, 3);
+    - name: 📜 Copy wallpaper PowerShell script to Windows
+      win_copy:
+        src: set_wallpaper.ps1
+        dest: C:\Users\Public\set_wallpaper.ps1
 
-        $taskName = "SetWallpaperTask";
-        $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-WindowStyle Hidden -Command `"Add-Type -TypeDefinition '$code'; [NativeMethods]::SystemParametersInfo(20, 0, '$imgPath', 3)`"";
-        $principal = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive -RunLevel Highest;
-        $task = New-ScheduledTask -Action $action -Principal $principal;
-        Register-ScheduledTask -TaskName $taskName -InputObject $task -Force;
-        Start-ScheduledTask -TaskName $taskName;
-        Start-Sleep -Seconds 5;
-        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false;
-      args:
-        executable: powershell
+    - name: 🖼️ Execute wallpaper PowerShell script
+      win_shell: powershell.exe -ExecutionPolicy Bypass -File C:\Users\Public\set_wallpaper.ps1
