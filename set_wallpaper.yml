@@ -34,12 +34,19 @@
       win_shell: |
         $imgPath = "C:\Users\Public\Pictures\wallpaper.png"
         $taskName = "SetWallpaperTask"
-        $encodedCommand = @"
-Add-Type -TypeDefinition '[DllImport("user32.dll", SetLastError = true)] public static class NativeMethods { public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni); }'
-[NativeMethods]::SystemParametersInfo(20, 0, "$imgPath", 3)
+        $command = @'
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public static class NativeMethods {
+  [DllImport("user32.dll", SetLastError = true)]
+  public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+}
 "@
+[NativeMethods]::SystemParametersInfo(20, 0, "$imgPath", 3)
+'@
 
-        $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -Command `$encodedCommand`"
+        $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -Command `$command`"
         $principal = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive -RunLevel Highest
         $task = New-ScheduledTask -Action $action -Principal $principal
         Register-ScheduledTask -TaskName $taskName -InputObject $task -Force
