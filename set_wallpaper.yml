@@ -7,6 +7,7 @@
     script_path: 'C:\\Users\\Public\\set-wallpaper.ps1'
 
   tasks:
+
     - name: 📄 Copy wallpaper image to Windows
       win_copy:
         src: wallpaper.png
@@ -27,8 +28,8 @@
 
     - name: 🗓️ Create scheduled task to apply the wallpaper
       win_scheduled_task:
-        name: "SetWallpaperTask"
-        description: "Set desktop wallpaper"
+        name: SetWallpaperTask
+        description: Set desktop wallpaper
         actions:
           - path: powershell.exe
             arguments: "-ExecutionPolicy Bypass -File \"{{ script_path }}\""
@@ -39,7 +40,7 @@
         enabled: yes
         trigger:
           - type: once
-            start_boundary: "{{ '%Y-%m-%dT%H:%M:%S' | strftime(ansible_date_time.epoch | int + 60) }}"
+            start_boundary: "{{ (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ') | community.general.to_windows_datetime).split('.')[0] }}"
         execution_time_limit: PT5M
 
     - name: ▶️ Run the scheduled task immediately
