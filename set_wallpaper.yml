@@ -3,10 +3,11 @@
   gather_facts: false
 
   tasks:
-    - name: 📄 Copy wallpaper image to Windows
+    - name: 📄 Replace wallpaper image to new one
       win_copy:
-        src: wallpaper.png
+        src: new_wallpaper.png
         dest: C:\Users\Public\Pictures\wallpaper.png
+        force: yes
 
     - name: 📜 Copy wallpaper PowerShell script to Windows
       win_copy:
