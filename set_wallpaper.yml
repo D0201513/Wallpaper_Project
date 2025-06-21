@@ -7,7 +7,7 @@
     - name: 📄 Copy wallpaper image to Windows
       win_copy:
         src: wallpaper1.png
-        dest: C:\Users\Public\Pictures\wallpaper.png
+        dest: C:\Users\Public\Public Pictures\wallpaper1.png
 
     - name: 🖼️ Set wallpaper path in registry (optional)
       win_regedit:
