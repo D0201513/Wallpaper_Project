@@ -1,15 +1,15 @@
 ---
-- name: 🪟 Set Windows Wallpaper via Registry
+- name: 🪟 Set Windows Wallpaper via PowerShell API
   hosts: windows
   gather_facts: false
-
   tasks:
+
     - name: 📄 Copy wallpaper image to Windows
       win_copy:
         src: wallpaper.png
         dest: C:\Users\Public\Pictures\wallpaper.png
 
-    - name: 🖼️ Set wallpaper path
+    - name: 🖼️ Set wallpaper path in registry (optional)
       win_regedit:
         path: HKCU:\Control Panel\Desktop
         name: Wallpaper
@@ -30,5 +30,17 @@
         data: "0"
         type: string
 
-    - name: 🔄 Apply wallpaper using RUNDLL32
-      win_command: RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters 1, True
+    - name: 🖼️ Force wallpaper using SystemParametersInfo API
+      win_shell: |
+        $imgPath = "C:\Users\Public\Pictures\wallpaper.png"
+        Add-Type -TypeDefinition @"
+        using System;
+        using System.Runtime.InteropServices;
+        public class Wallpaper {
+          [DllImport("user32.dll", SetLastError = true)]
+          public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+        }
+        "@
+        [Wallpaper]::SystemParametersInfo(20, 0, $imgPath, 3)
+      args:
+        executable: powershell
