@@ -3,8 +3,8 @@
   hosts: windows
   gather_facts: false
   vars:
-    wallpaper_path: "C:\\Users\\Public\\Pictures\\wallpaper.png"
-    script_path: "C:\\Users\\Public\\set-wallpaper.ps1"
+    wallpaper_path: 'C:\\Users\\Public\\Pictures\\wallpaper.png'
+    script_path: 'C:\\Users\\Public\\set-wallpaper.ps1'
 
   tasks:
     - name: 📄 Copy wallpaper image to Windows
@@ -23,7 +23,7 @@
               public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
           }
 "@
-          [Wallpaper]::SystemParametersInfo(20, 0, "{{ wallpaper_path }}", 3)
+          [Wallpaper]::SystemParametersInfo(20, 0, '{{ wallpaper_path }}', 3)
 
     - name: 🗓️ Create scheduled task to apply the wallpaper
       win_scheduled_task:
