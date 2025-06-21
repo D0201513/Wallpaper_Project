@@ -14,5 +14,17 @@
         src: set_wallpaper.ps1
         dest: C:\Users\Public\set_wallpaper.ps1
 
-    - name: 🖼️ Execute wallpaper PowerShell script
-      win_shell: powershell.exe -ExecutionPolicy Bypass -File C:\Users\Public\set_wallpaper.ps1
+    - name: 🖼️ Run script as logged-in user via scheduled task
+      win_shell: |
+        $task = @{
+          TaskName    = "ApplyWallpaper"
+          Action      = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File 'C:\Users\Public\set_wallpaper.ps1'"
+          Principal   = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive -RunLevel Highest
+          Settings    = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+        }
+        Register-ScheduledTask @task -Force
+        Start-ScheduledTask -TaskName "ApplyWallpaper"
+        Start-Sleep -Seconds 5
+        Unregister-ScheduledTask -TaskName "ApplyWallpaper" -Confirm:$false
+      args:
+        executable: powershell.exe
