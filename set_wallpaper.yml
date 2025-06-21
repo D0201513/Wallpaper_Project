@@ -6,14 +6,14 @@
   tasks:
     - name: 📄 Copy wallpaper image to Windows
       win_copy:
-        src: wallpaper1.png
-        dest: C:\Users\Public\Public Pictures\wallpaper1.png
+        src: wallpaper.png
+        dest: C:\Users\Public\Pictures\wallpaper.png
 
     - name: 🖼️ Set wallpaper path in registry (optional)
       win_regedit:
         path: HKCU:\Control Panel\Desktop
         name: Wallpaper
-        data: C:\Users\Public\Pictures\wallpaper1.png
+        data: C:\Users\Public\Pictures\wallpaper.png
         type: string
 
     - name: 🧭 Set WallpaperStyle to Fill
@@ -32,7 +32,7 @@
 
     - name: 🖼️ Force wallpaper using SystemParametersInfo API
       win_shell: |
-        $imgPath = "C:\Users\Public\Pictures\wallpaper1.png"
+        $imgPath = "C:\Users\Public\Pictures\wallpaper.png"
         Add-Type -TypeDefinition @"
         using System;
         using System.Runtime.InteropServices;
