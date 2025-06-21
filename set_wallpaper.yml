@@ -4,6 +4,7 @@
   gather_facts: false
   vars:
     wallpaper_path: "C:\\Users\\Public\\Pictures\\wallpaper.png"
+    script_path: "C:\\Users\\Public\\set-wallpaper.ps1"
 
   tasks:
     - name: 📄 Copy wallpaper image to Windows
@@ -11,9 +12,9 @@
         src: wallpaper.png
         dest: "{{ wallpaper_path }}"
 
-    - name: 📝 Create wallpaper set script
+    - name: 📝 Create PowerShell script to set wallpaper
       win_copy:
-        dest: "C:\\Users\\Public\\set-wallpaper.ps1"
+        dest: "{{ script_path }}"
         content: |
           Add-Type @"
           using System.Runtime.InteropServices;
@@ -24,13 +25,13 @@
 "@
           [Wallpaper]::SystemParametersInfo(20, 0, "{{ wallpaper_path }}", 3)
 
-    - name: 🗓️ Create a scheduled task to apply the wallpaper
+    - name: 🗓️ Create scheduled task to apply the wallpaper
       win_scheduled_task:
         name: "SetWallpaperTask"
         description: "Set desktop wallpaper"
         actions:
           - path: powershell.exe
-            arguments: "-ExecutionPolicy Bypass -File C:\\Users\\Public\\set-wallpaper.ps1"
+            arguments: "-ExecutionPolicy Bypass -File \"{{ script_path }}\""
         username: "{{ ansible_user }}"
         password: "{{ ansible_password }}"
         run_level: highest
@@ -38,7 +39,7 @@
         enabled: yes
         trigger:
           - type: once
-            start_boundary: "{{ (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ') | community.general.to_windows_datetime).split('.')[0] }}"
+            start_boundary: "{{ '%Y-%m-%dT%H:%M:%S' | strftime(ansible_date_time.epoch | int + 60) }}"
         execution_time_limit: PT5M
 
     - name: ▶️ Run the scheduled task immediately
