@@ -2,11 +2,11 @@
 - name: 🪟 Set Windows Wallpaper via PowerShell API
   hosts: windows
   gather_facts: false
-  tasks:
 
+  tasks:
     - name: 📄 Copy wallpaper image to Windows
       win_copy:
-        src: wallpaper1.png
+        src: files/wallpaper1.png
         dest: C:\Users\Public\Pictures\wallpaper.png
 
     - name: 🖼️ Set wallpaper path in registry (optional)
