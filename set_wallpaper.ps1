@@ -9,4 +9,10 @@ public class Wallpaper {
 Add-Type $code
 
 $imgPath = "C:\Users\Public\Pictures\wallpaper.png"
-[Wallpaper]::SystemParametersInfo(20, 0, $imgPath, 3)
+$result = [Wallpaper]::SystemParametersInfo(20, 0, $imgPath, 3)
+
+if (-not $result) {
+  Write-Error "Failed to set wallpaper. Error code: $([Runtime.InteropServices.Marshal]::GetLastWin32Error())"
+} else {
+  Write-Host "Wallpaper set successfully."
+}
