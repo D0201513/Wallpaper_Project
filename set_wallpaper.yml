@@ -1,4 +1,3 @@
----
 - name: 🪟 Set Windows Wallpaper via Scheduled Task Script
   hosts: windows
   gather_facts: false
@@ -14,19 +13,16 @@
         src: set_wallpaper.ps1
         dest: C:\Users\Public\set_wallpaper.ps1
 
-    - name: 🖼️ Run script as logged-in user via scheduled task
+    - name: 🖼️ Run wallpaper script as logged-in user via scheduled task
       win_shell: |
-        $user = "$env:USERNAME"
+        $user = "$env:COMPUTERNAME\$env:USERNAME"
         Write-Host "Running scheduled task as user: $user"
-        $task = @{
-          TaskName    = "ApplyWallpaper"
-          Action      = New-ScheduledTaskAction -Execute "powershell.exe" -Argument '-ExecutionPolicy Bypass -File "C:\Users\Public\set_wallpaper.ps1"'
-          Principal   = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Highest
-          Settings    = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-        }
-        Write-Host "Task object details:"
-        $task | Format-List | Out-String | Write-Host
-        Register-ScheduledTask @task -Force
+
+        $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument '-ExecutionPolicy Bypass -File "C:\Users\Public\set_wallpaper.ps1"'
+        $principal = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Highest
+        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+
+        Register-ScheduledTask -TaskName "ApplyWallpaper" -Action $action -Principal $principal -Settings $settings -Force
         Start-ScheduledTask -TaskName "ApplyWallpaper"
         Start-Sleep -Seconds 5
         Unregister-ScheduledTask -TaskName "ApplyWallpaper" -Confirm:$false
