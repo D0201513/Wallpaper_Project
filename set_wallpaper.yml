@@ -13,7 +13,7 @@
       win_regedit:
         path: HKCU:\Control Panel\Desktop
         name: Wallpaper
-        data: C:\Users\Public\Pictures\wallpaper.png
+        data: C:\Users\Public\Pictures\wallpaper1.png
         type: string
 
     - name: 🧭 Set WallpaperStyle to Fill
@@ -32,7 +32,7 @@
 
     - name: 🖼️ Force wallpaper using SystemParametersInfo API
       win_shell: |
-        $imgPath = "C:\Users\Public\Pictures\wallpaper.png"
+        $imgPath = "C:\Users\Public\Pictures\wallpaper1.png"
         Add-Type -TypeDefinition @"
         using System;
         using System.Runtime.InteropServices;
