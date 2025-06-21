@@ -16,12 +16,16 @@
 
     - name: 🖼️ Run script as logged-in user via scheduled task
       win_shell: |
+        $user = "$env:USERNAME"
+        Write-Host "Running scheduled task as user: $user"
         $task = @{
           TaskName    = "ApplyWallpaper"
-          Action      = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File 'C:\Users\Public\set_wallpaper.ps1'"
-          Principal   = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive -RunLevel Highest
+          Action      = New-ScheduledTaskAction -Execute "powershell.exe" -Argument '-ExecutionPolicy Bypass -File "C:\Users\Public\set_wallpaper.ps1"'
+          Principal   = New-ScheduledTaskPrincipal -UserId $user -LogonType Interactive -RunLevel Highest
           Settings    = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
         }
+        Write-Host "Task object details:"
+        $task | Format-List | Out-String | Write-Host
         Register-ScheduledTask @task -Force
         Start-ScheduledTask -TaskName "ApplyWallpaper"
         Start-Sleep -Seconds 5
